@@ -26,10 +26,8 @@ class CountDownTimerViewModel @Inject constructor(
     private fun simpleFlow(): Flow<Int> = flow {
         for (i in _count.value downTo 0) {
             emit(i)
-            Log.d("asdsad2", "i is $i")
             _count.value = i
             delay(1000L)
-            Log.d("asdsad3", "count is ${count.value}")
         }
     }
 
@@ -38,12 +36,9 @@ class CountDownTimerViewModel @Inject constructor(
             when (event) {
                 is CountDownEvent.OnStartButtonClick -> {
                     startTimerFun()
-                    //simpleCountDown()
                 }
                 is CountDownEvent.OnStopButtonClick -> {
                     stopTimerFun()
-                    Log.d("asdsad2", "Cancel is ${count.value}")
-
                 }
                 is CountDownEvent.OnRestartButtonClick -> {
                     resetTimerFun()
