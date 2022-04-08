@@ -1,6 +1,5 @@
 package com.bytezeroone.countdowntimer.presentation
 
-import android.util.Log
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
@@ -18,7 +17,7 @@ class CountDownTimerViewModel @Inject constructor(
 
 ): ViewModel() {
 
-    var _count = mutableStateOf(60)
+    private var _count = mutableStateOf(60)
     var count: State<Int> = _count
 
     var stopTimer = mutableStateOf(false)
