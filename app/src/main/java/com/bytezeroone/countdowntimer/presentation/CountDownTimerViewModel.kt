@@ -1,14 +1,13 @@
 package com.bytezeroone.countdowntimer.presentation
 
-import androidx.compose.runtime.State
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.cancel
+import kotlinx.coroutines.cancelChildren
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -16,59 +15,56 @@ import javax.inject.Inject
 class CountDownTimerViewModel @Inject constructor(
 
 ): ViewModel() {
+    //refactoring
+    var time by mutableStateOf(6)
 
-    private var _count = mutableStateOf(60)
-    var count: State<Int> = _count
+    private var isActive = false
 
-    var stopTimer = mutableStateOf(false)
+    private var timer = 6
 
-    private fun simpleFlow(): Flow<Int> = flow {
-        for (i in _count.value downTo 0) {
-            emit(i)
-            _count.value = i
-            delay(1000L)
+    private var lastStamp = 0
+    private fun startTimer() {
+        if (isActive || time == 0) return
+        viewModelScope.launch {
+            lastStamp = 1
+            this@CountDownTimerViewModel.isActive = true
+            while (this@CountDownTimerViewModel.isActive) {
+                time -= 1
+                delay(1000L)
+                timer = time - 1
+                if (timer == -1) {
+                    this@CountDownTimerViewModel.isActive = false
+                }
+            }
         }
+    }
+
+    private fun pauseTimer() {
+        isActive = false
+    }
+
+    private fun resetTimer() {
+        viewModelScope.coroutineContext.cancelChildren()
+        timer = 6
+        lastStamp = 1
+        time = 6
+        isActive = false
     }
 
     fun onEvent(event: CountDownEvent) {
         viewModelScope.launch {
             when (event) {
                 is CountDownEvent.OnStartButtonClick -> {
-                    startTimerFun()
+                    startTimer()
                 }
                 is CountDownEvent.OnStopButtonClick -> {
-                    stopTimerFun()
+                    pauseTimer()
                 }
                 is CountDownEvent.OnRestartButtonClick -> {
-                    resetTimerFun()
+                    resetTimer()
 
                 }
             }
         }
-    }
-
-    private fun startTimerFun() {
-        viewModelScope.launch {
-            simpleFlow()
-                .collect {
-                    when (stopTimer.value) {
-                        true -> cancel()
-                        else -> { Unit }
-                    }
-                }
-        }
-    }
-
-    private suspend fun stopTimerFun() {
-        stopTimer.value = true
-        delay(1000L)
-        stopTimer.value = false
-
-    }
-
-    private suspend fun resetTimerFun() {
-        stopTimerFun()
-        _count.value = 60
-        startTimerFun()
     }
 }

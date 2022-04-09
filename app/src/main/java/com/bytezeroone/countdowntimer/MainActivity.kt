@@ -55,7 +55,8 @@ fun CountDownTimerScreen(
                 modifier = Modifier.fillMaxSize()
             ) {
                 Text(
-                    text = viewModel.count.value.toString(),
+                    //text = viewModel.count.value.toString(),
+                    text = viewModel.time.toString(),
                     modifier = Modifier.padding(16.dp)
                 )
                 Row(
@@ -63,7 +64,6 @@ fun CountDownTimerScreen(
                     modifier = Modifier
                         .fillMaxWidth()
                 ) {
-
                     Button(
                         enabled = buttonState,
                         onClick = {
@@ -88,12 +88,12 @@ fun CountDownTimerScreen(
                     Spacer(modifier = Modifier.width(8.dp))
                     Button(
                         onClick = {
-                            buttonState = false
+                            buttonState = true
                             viewModel.onEvent(CountDownEvent.OnRestartButtonClick)
                         },
                         modifier = Modifier.width(108.dp)
                     ) {
-                        Text(text = "Restart")
+                        Text(text = "Reset")
                     }
                 }
             }
