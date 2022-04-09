@@ -16,22 +16,21 @@ class CountDownTimerViewModel @Inject constructor(
 
 ): ViewModel() {
     //refactoring
-    var time by mutableStateOf(6)
+    var time by mutableStateOf(60)
 
     private var isActive = false
 
-    private var timer = 6
+    private var timer = 60
+    private var timeStamp = 1
 
-    private var lastStamp = 0
     private fun startTimer() {
         if (isActive || time == 0) return
         viewModelScope.launch {
-            lastStamp = 1
             this@CountDownTimerViewModel.isActive = true
             while (this@CountDownTimerViewModel.isActive) {
-                time -= 1
+                timer -= 1
+                time = timer
                 delay(1000L)
-                timer = time - 1
                 if (timer == -1) {
                     this@CountDownTimerViewModel.isActive = false
                 }
@@ -45,9 +44,8 @@ class CountDownTimerViewModel @Inject constructor(
 
     private fun resetTimer() {
         viewModelScope.coroutineContext.cancelChildren()
-        timer = 6
-        lastStamp = 1
-        time = 6
+        timer = 60
+        time = 60
         isActive = false
     }
 
